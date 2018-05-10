@@ -37,9 +37,9 @@ Schedules endpoint:
 
 api/schedules POST - in body - startPort(string), destination(string), airplaneId(int), weatherId(int) - assings exsiting Weather </br> 
 api/schedules POST - in body - startPort(string), destination(string), airplaneId(int), weather(Weather) - creates new Weather </br> 
-api/schedules/id PUT - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int) - assings exsiting Weather </br>   
+api/schedules/id PUT - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int) - assings exsiting Weather </br>
 api/schedules/id PUT - in url - id - in body - startPort(string), destination(string), airplaneId(int), weather(Weather) - creates new Weather </br>
 api/schedules/id PUT - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int), weather(Weather) - puts assigned Weather </br>
-api/schedules/id PATCH - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int) - assings exsiting Weather </br>  
+api/schedules/id PATCH - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int) - assings exsiting Weather </br>
 api/schedules/id PATCH - in url - id - in body - startPort(string), destination(string), airplaneId(int), weather(Weather) - creates new Weather </br>
 api/schedules/id PATCH - in url - id - in body - startPort(string), destination(string), airplaneId(int), weatherId(int), weather(Weather) - puts assigned Weather </br>
