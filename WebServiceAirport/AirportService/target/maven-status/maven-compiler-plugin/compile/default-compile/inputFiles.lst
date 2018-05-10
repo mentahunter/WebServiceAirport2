@@ -1,0 +1,10 @@
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/AirplaneRepository.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/ScheduleRepository.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/ScheduleController.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/AirplaneController.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/exceptions/WebException.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/Weather.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/Airplane.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/AirportServiceApplication.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/WeatherController.java
+/WebServiceAirport/AirportService/src/main/java/com/mycompany/airportservice/Schedule.java

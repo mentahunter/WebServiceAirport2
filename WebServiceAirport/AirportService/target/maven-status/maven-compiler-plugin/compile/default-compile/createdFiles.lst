@@ -1,0 +1,10 @@
+com/mycompany/airportservice/Airplane.class
+com/mycompany/airportservice/AirplaneRepository.class
+com/mycompany/airportservice/WeatherController.class
+com/mycompany/airportservice/exceptions/WebException.class
+com/mycompany/airportservice/ScheduleController.class
+com/mycompany/airportservice/ScheduleRepository.class
+com/mycompany/airportservice/AirplaneController.class
+com/mycompany/airportservice/Schedule.class
+com/mycompany/airportservice/Weather.class
+com/mycompany/airportservice/AirportServiceApplication.class

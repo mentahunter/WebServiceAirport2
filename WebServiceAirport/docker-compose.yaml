@@ -1,0 +1,29 @@
+version: '2'
+services:
+  app:
+    build: ./AirportService
+    image: artiom/airportservice
+    working_dir: /AirportService
+    volumes:
+      - ./AirportService:/AirportService
+      - ~/.m2:/root/.m2
+    ports:
+      - "5000:5000"
+    command: mvn clean spring-boot:run
+    depends_on:
+      - mysql
+    links:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: DockerAirport
+      MYSQL_USER: springuser
+      MYSQL_PASSWORD: password
+    container_name: mysql-standalone
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
