@@ -1,5 +1,5 @@
 docker-compose up -d </br>
-port: 80 </br>
+port: 5000 </br>
 
 Airplane endpoint: </br>
 api/airplanes GET - no params </br>

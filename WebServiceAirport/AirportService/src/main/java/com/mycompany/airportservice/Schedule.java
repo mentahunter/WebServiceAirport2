@@ -11,6 +11,7 @@ public class Schedule{
     private String startPort;
     private String destination;
     private Long airplaneId;
+	private transient Airplane airplane;
     private Long weatherId;
     private transient  Weather weather;
     
@@ -53,7 +54,13 @@ public class Schedule{
     public void setWeatherId(Long weatherId) {
         this.weatherId = weatherId;
     }
+	public Airplane getAirplane() {
+        return airplane;
+    }
 
+    public void setAirplane(Airplane airplane) {
+        this.airplane = airplane;
+    }
     public Weather getWeather() {
         return weather;
     }
