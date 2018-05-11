@@ -43,7 +43,11 @@ public class ScheduleController{
 					schedule.setWeather(weather);
 				}
 				catch(Exception e){
-				}
+					if(!e.getMessage().contains("I/O error")){
+						throw new WebException("GET api/schedules", "- no weather found");
+					}
+					return null;
+				}    
             }
         }
         return schedules;
@@ -63,13 +67,17 @@ public class ScheduleController{
 				schedule.setWeather(weather);
 			}
 			catch(Exception e){
-			}
+				if(!e.getMessage().contains("I/O error")){
+					throw new WebException("GET api/schedules/id", "- no weather found");
+				}
+			return null;
+        }    
         }
         return schedule;
     }
 
     @PostMapping("/schedules")
-    public Schedule createSchedule(@Valid @RequestBody Schedule schedule, HttpServletResponse response){
+    public Schedule createSchedule(@Valid @RequestBody Schedule schedule, HttpServletResponse response, @RequestParam(value = "embed", required = false) String embed){
         if (schedule.getId() != null && scheduleRepository.existsById(schedule.getId())){
             throw new WebException("POST api/schedules", "- schedule exists with this id: " + schedule.getId());
         }
@@ -80,7 +88,9 @@ public class ScheduleController{
             throw new WebException("PUT api/schedules", "- weather - missing fields");
         }
         final Airplane airplane = airplaneRepository.findById(schedule.getAirplaneId()).orElseThrow(() -> new WebException("POST api/schedules", "- no such airplane with id: " + schedule.getAirplaneId()));
+		if (embed != null && embed.contains("airplanes")){
 			schedule.setAirplane(airplane);
+		}
         Weather weather = null;
         if(schedule.getWeatherId() != null && schedule.getWeather() == null){
             weather = getWeather(schedule.getWeatherId());  
@@ -91,7 +101,9 @@ public class ScheduleController{
 		
 		if(weather != null){
             schedule.setWeatherId(weather.getId());
-            schedule.setWeather(weather);
+			if (embed != null && embed.contains("weathers")){
+				schedule.setWeather(weather);
+			}
         }
         response.setStatus(201);
         Schedule scheduleNew = scheduleRepository.save(schedule);
@@ -101,7 +113,7 @@ public class ScheduleController{
     }
 
     @PutMapping("/schedules/{id}")
-    public Schedule updateSchedule(@PathVariable(value = "id") Long scheduleId, @Valid @RequestBody Schedule newSchedule, HttpServletResponse response){
+    public Schedule updateSchedule(@PathVariable(value = "id") Long scheduleId, @Valid @RequestBody Schedule newSchedule, HttpServletResponse response, @RequestParam(value = "embed", required = false) String embed){
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new WebException("PUT api/schedules/id", "- no such schedule"));
         if (newSchedule.getAirplaneId() == null || newSchedule.getStartPort() == null || newSchedule.getDestination() == null){
             throw new WebException("PUT api/schedules", "- missing fields");
@@ -114,7 +126,10 @@ public class ScheduleController{
         schedule.setStartPort(newSchedule.getStartPort());
         schedule.setDestination(newSchedule.getDestination());
         schedule.setAirplaneId(newSchedule.getAirplaneId());
-		schedule.setAirplane(airplane);
+		if (embed != null && embed.contains("airplanes")){
+			schedule.setAirplane(airplane);
+		}
+		
         Weather weather = null;
         if(newSchedule.getWeatherId() != null && newSchedule.getWeather() == null){
             weather = getWeather(newSchedule.getWeatherId());		
@@ -127,7 +142,9 @@ public class ScheduleController{
         }
         if(weather != null){
             schedule.setWeatherId(weather.getId());
-            schedule.setWeather(weather);
+			if (embed != null && embed.contains("weathers")){
+				schedule.setWeather(weather);
+			}
         }
         
         response.setStatus(201);
@@ -135,7 +152,7 @@ public class ScheduleController{
         return scheduleRepository.save(schedule);
     }
     @PatchMapping("/schedules/{id}")
-    public Schedule patchSchedule(@PathVariable(value = "id") Long scheduleId, @Valid @RequestBody Schedule newSchedule, HttpServletResponse response) {
+    public Schedule patchSchedule(@PathVariable(value = "id") Long scheduleId, @Valid @RequestBody Schedule newSchedule, HttpServletResponse response, @RequestParam(value = "embed", required = false) String embed) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new WebException("PATCH api/sechedules/id", "- no such schedule"));
         if(newSchedule.getStartPort() != null){
             schedule.setStartPort(newSchedule.getStartPort());
@@ -147,7 +164,9 @@ public class ScheduleController{
 			final Airplane airplane = airplaneRepository.findById(newSchedule.getAirplaneId()).orElseThrow(() -> new WebException("PUT api/schedules/id", "- no such airplane with id: " + newSchedule.getAirplaneId()));
 			
             schedule.setAirplaneId(newSchedule.getAirplaneId());
-			schedule.setAirplane(airplane);
+			if (embed != null && embed.contains("airplanes")){
+				schedule.setAirplane(airplane);
+			}
         }
         
         Weather weather = null;
@@ -163,7 +182,9 @@ public class ScheduleController{
         
         if(weather != null){
             schedule.setWeatherId(weather.getId());
-            schedule.setWeather(weather);
+			if (embed != null && embed.contains("weathers")){
+				schedule.setWeather(weather);
+			}
         }
         response.setStatus(202);
         response.addHeader("Location", "api/schedules/" + scheduleId);
@@ -183,7 +204,10 @@ public class ScheduleController{
             weather = restTemplate.getForObject("http://app2:5000/locations/" + id, Weather.class);
         }
         catch(Exception e){
-            //throw new WebException("GET api/schedules", "- no weather found");
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("GET api/schedules", "- no weather found");
+			}
+			return null;
         }    
         return weather;
     }
@@ -198,21 +222,25 @@ public class ScheduleController{
             Weather[] weatherList = responseEntity.getBody();
             return weatherList[weatherList.length - 1];
         }
-        catch(Exception e){
-            //throw new WebException("POST api/schedules", "- weather - " + e.getMessage());
-        }
-		return null;
+		catch(Exception e){
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("POST api/schedules", "- weather - " + e.getMessage());
+			}
+			return null;
+        }    
     }
     
     private Weather putWeather(Long id, Weather w){
-        //Weather weather = null;
+        Weather weather = null;
         try{
-            restTemplate.getForObject("http://app2:5000/locations/" + id, Weather.class);
+            weather = restTemplate.getForObject("http://app2:5000/locations/" + id, Weather.class);
         }
         catch(Exception e){
-            //throw new WebException("PUT api/schedules/id", "- no weather found");
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("PUT api/schedules/id", "- no weather found");
+			}
 			return null;
-        }    
+        }      
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Weather> requestBody = new HttpEntity<>(w, headers);
@@ -222,15 +250,20 @@ public class ScheduleController{
             Weather[] weatherList = responseEntity.getBody();
             return weatherList[id.intValue() - 1];
         }
-        catch(Exception e){
-                //throw new WebException("PUT api/schedules/id", "- weather - " + e.getMessage());
-        }
-		return null;
+		catch(Exception e){
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("PUT api/schedules/id", "- weather - " + e.getMessage());
+			}
+			return null;
+        }   
     }
     private Weather patchWeather(Long id, Weather w){
         Weather weather = null;
         try{
             weather = restTemplate.getForObject("http://app2:5000/locations/" + id, Weather.class);
+			if(weather == null){
+				throw new WebException("PATCH api/schedules/id", "- no weather found");
+			}
             if(w.getTemperature() != null){
                 weather.setTemperature(w.getTemperature());
             }
@@ -241,10 +274,12 @@ public class ScheduleController{
                 weather.setDate(w.getDate());
             }
         }
-        catch(Exception e){
-            throw new WebException("PATCH api/schedules/id", "- no weather found");
-        }
-        
+		catch(Exception e){
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("PATCH api/schedules/id", "- no weather found");
+			}
+			return null;
+        }   
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Weather> requestBody = new HttpEntity<>(weather, headers);
@@ -254,9 +289,11 @@ public class ScheduleController{
             Weather[] weatherList = responseEntity.getBody();
             return weatherList[id.intValue() - 1];
         }
-        catch(Exception e){
-                //throw new WebException("PUT api/schedules/id", "- weather - " + e.getMessage());
-        }
-		return null;
+		catch(Exception e){
+			if(!e.getMessage().contains("I/O error")){
+				throw new WebException("PUT api/schedules/id", "- weather - " + e.getMessage());
+			}
+			return null;
+        }   
     }
 }
