@@ -46,7 +46,7 @@ public class ScheduleController{
 					if(!e.getMessage().contains("I/O error")){
 						throw new WebException("GET api/schedules", "- no weather found");
 					}
-					return null;
+					schedule.setWeather(null);
 				}    
             }
         }
@@ -70,7 +70,7 @@ public class ScheduleController{
 				if(!e.getMessage().contains("I/O error")){
 					throw new WebException("GET api/schedules/id", "- no weather found");
 				}
-			return null;
+			schedule.setWeather(null);
         }    
         }
         return schedule;
